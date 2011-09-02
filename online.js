@@ -1,0 +1,1 @@
+window.combrianpfeil = {'isOnline': true};

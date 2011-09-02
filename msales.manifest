@@ -1,0 +1,20 @@
+CACHE MANIFEST
+# v25
+
+CACHE:
+offline.js
+# /soap/ajax/15.0/connection.js
+# /soap/ajax/15.0/apex.js
+http://code.jquery.com/mobile/1.0b2/images/ajax-loader.png
+http://code.jquery.com/mobile/1.0b2/images/icons-18-white.png
+http://code.jquery.com/mobile/1.0b2/images/icon-search-black.png
+http://code.jquery.com/jquery-1.6.2.min.js
+http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js
+http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.js
+http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.css
+
+NETWORK:
+*
+
+FALLBACK:
+online.js offline.js

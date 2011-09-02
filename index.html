@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<!-- <html lang="en" manifest="msales.manifest"> -->
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+	<title>mSales</title>
+	<meta name="generator" content="TextMate http://macromates.com/"></meta>
+	<meta name="author" content="Brian Pfeil"></meta>
+	<meta name="apple-mobile-web-app-capable" content="yes"></meta>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
+
+	<!--
+	<script src="/soap/ajax/15.0/connection.js"></script>
+	<script src="/soap/ajax/15.0/apex.js"></script>	
+	-->
+
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.css" />
+	<script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+	
+	<script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+	
+	<!-- main app -->
+	<script src="app.js"></script>
+	
+	<!-- this must load after app script for mobileinit to work correctly -->
+	<script src="http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.js"></script>
+	
+	<script id="object-list-page-template" type="text/x-jquery-tmpl">
+
+	<div data-role="page" id="${type}-list-page" data-url='${type}-list-page'> 
+		<div data-role="header">
+			<h1>${pageTitle}</h1>
+			<a id='${type}-add-link' data-obj-type='${type}' class='ui-btn-right object-add-link' data-icon="add">Add</a>
+		</div> 
+	
+		<div data-role="content">
+			<ul data-role="listview" id="${type}-list" data-filter="true">
+			</ul>
+		</div> 
+	
+		<div data-role="footer" data-id='footer-nav-bar' data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#contact-list-page" data-transition="fade" class="${(type == 'contact') ? 'ui-btn-active' : ''} ui-state-persist">Contacts</a></li>
+					<li><a href="#account-list-page" data-transition="fade" class="${(type == 'account') ? 'ui-btn-active' : ''} ui-state-persist">Accounts</a></li>
+				</ul>
+			</div>
+		</div> 
+	</div> 
+
+	</script>
+
+	<script id="object-row-template" type="text/x-jquery-tmpl">
+	<li>
+		<a href='#${def.type}-${obj.Id}' rel='external' data-obj-type='${def.type}' data-obj-id='${obj.Id}' class='list-row'>${def.rowTitleFn(obj)}</a>
+	</li>	
+	</script>
+
+	<script id="account-detail-page-template" type="text/x-jquery-tmpl">
+	<div data-role="page" id="${def.type}-${obj.Id}" data-url="${def.type}-${obj.Id}" data-dom-cache='false' data-add-back-btn="true"> 
+		<div data-role="header" data-position="fixed">
+			<h1>${obj.Name}</h1>
+			<a id='${def.type}-add-link' rel='external' data-obj-type='${def.type}' class='ui-btn-right object-add-link'>Edit</a>
+		</div> 
+	
+		<div data-role="content">
+
+		<table border="0" cellspacing="5" cellpadding="5">
+			<tr>
+				<th>Type</th>
+				<td>${obj.Type}</td>
+			</tr>
+			<tr>
+				<th>Industry</th>
+				<td>${obj.Industry}</td>
+			</tr>
+			<tr>
+				<th>Phone</th>
+				<td><a href='tel:${obj.Phone}'>${obj.Phone}</a></td>
+			</tr>
+			<tr>
+				<th>Fax</th>
+				<td><a href='tel:${obj.Fax}'>${obj.Fax}</a></td>
+			</tr>
+			<tr>
+				<th>Website</th>
+				<td><a href='http://${obj.Website}' rel='external' target='_blank'>${obj.Website}</a></td>
+			</tr>
+		</table>
+		</div> 
+	
+		<div data-role="footer">
+		</div> 
+	</div>	
+	</script>
+	
+	<script id="contact-detail-page-template" type="text/x-jquery-tmpl">
+	<div data-role="page" id="${def.type}-${obj.Id}" data-url="${def.type}-${obj.Id}" data-dom-cache='false' data-add-back-btn="true"> 
+		<div data-role="header" data-position="fixed">
+			<h1>${def.rowTitleFn(obj)}</h1>
+			<a id='${def.type}-add-link' rel='external' data-obj-id='${obj.Id}' data-obj-type='${def.type}' class='ui-btn-right object-add-link'>Edit</a>
+		</div> 
+	
+		<div data-role="content">
+			<table border="0" cellspacing="5" cellpadding="5">
+				<tr>
+					<th>Title</th>
+					<td>${obj.Title}</td>
+				</tr>
+				<tr>
+					<th>Dept</th>
+					<td>${obj.Department}</td>
+				</tr>
+				<tr>
+					<th>Phone</th>
+					<td><a href='tel:${obj.Phone}'>${obj.Phone}</a></td>
+				</tr>
+				<tr>
+					<th>Email</th>
+					<td><a href='mailto:${obj.Email}'>${obj.Email}</a></td>
+				</tr>
+			</table>
+		</div> 
+	
+		<div data-role="footer">
+		</div> 
+	</div>	
+	</script>
+
+	<script id="contact-edit-page-template" type="text/x-jquery-tmpl">
+	<div data-role="page" id="${def.type}-edit-page" data-url="${def.type}-edit-page"> 
+		<div data-role="header" data-position="fixed">
+			<a href="#" data-rel="back" data-icon="delete">Cancel</a>
+			<h1>Edit Contact</h1>
+			<a id='${def.type}-save-link' data-obj-id='${obj.Id}' data-obj-type='${def.type}' class='object-save-link' data-icon="check">Save</a>
+		</div> 
+	
+		<div data-role="content">
+			<form>
+				<input type="hidden" name="Id" id="Id" value="${obj.Id}"  />
+				<input type="hidden" name="obj-type" id="obj-type" value="${def.type}"  />
+				<div data-role="fieldcontain">
+				    <label for="LastName">Last Name:</label>
+				    <input type="text" name="LastName" id="LastName" value="${obj.LastName}"  />
+				</div>
+				<div data-role="fieldcontain">
+				    <label for="FirstName">First Name:</label>
+				    <input type="text" name="FirstName" id="FirstName" value="${obj.FirstName}"  />
+				</div>
+				<div data-role="fieldcontain">
+				    <label for="Title">Title:</label>
+				    <input type="text" name="Title" id="Title" value="${obj.Title}"  />
+				</div>
+				<div data-role="fieldcontain">
+				    <label for="Department">Department:</label>
+				    <input type="text" name="Department" id="Department" value="${obj.Department}"  />
+				</div>
+				<div data-role="fieldcontain">
+				    <label for="Phone">Phone:</label>
+				    <input type="text" name="Phone" id="Phone" value="${obj.Phone}"  />
+				</div>
+				<div data-role="fieldcontain">
+				    <label for="Email">Email:</label>
+				    <input type="text" name="Email" id="Email" value="${obj.Email}"  />
+				</div>
+			</form>			
+		</div> 
+	
+		<div data-role="footer">
+		</div> 
+	</div>	
+	</script>
+	
+	<script id="form-text-field-template" type="text/x-jquery-tmpl">
+	<div data-role="fieldcontain">
+	    <label for="${def.name}">${def.label}:</label>
+	    <input type="text" name="${def.name}" id="${def.name}" value="${obj[def.name]}"  />
+	</div>
+	</script>
+
+	<style type="text/css" media="screen">
+		th {
+			text-align: right;
+		}
+	</style>
+
+</head>
+	<body>
+		<div id='container' style="display: none;"></div>
+	</body>
+</html>
