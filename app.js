@@ -160,6 +160,28 @@
 					},
 					'account': {
 						'type': 'account',
+						'fields': [
+							{
+								'name': 'Type',
+								'label': 'Type'
+							},
+							{
+								'name': 'Industry',
+								'label': 'Industry'
+							},
+							{
+								'name': 'Phone',
+								'label': 'Phone'
+							},
+							{
+								'name': 'Fax',
+								'label': 'Fax'
+							},
+							{
+								'name': 'Website',
+								'label': 'Website'
+							}
+						],						
 						'pageTitle': 'Accounts',
 						'sortFn': makeCompareFunctionFromSortDefs([
 							{
