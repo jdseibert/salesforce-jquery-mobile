@@ -120,11 +120,11 @@
 						'fields': [
 							{
 								'name': 'LastName',
-								'label': 'Last name'
+								'label': 'Last Name'
 							},
 							{
 								'name': 'FirstName',
-								'label': 'First name'
+								'label': 'First Name'
 							},
 							{
 								'name': 'Title',
@@ -136,11 +136,13 @@
 							},
 							{
 								'name': 'Phone',
-								'label': 'Phone'
+								'label': 'Phone',
+								'fmt': 'phone'
 							},
 							{
 								'name': 'Email',
-								'label': 'Email'
+								'label': 'Email',
+								'fmt': 'email'
 							}
 						],
 						'pageTitle': 'Contacts',
@@ -161,6 +163,10 @@
 					'account': {
 						'type': 'account',
 						'fields': [
+    						{
+    							'name': 'Name',
+    							'label': 'Name'
+    						},
 							{
 								'name': 'Type',
 								'label': 'Type'
@@ -171,15 +177,18 @@
 							},
 							{
 								'name': 'Phone',
-								'label': 'Phone'
+								'label': 'Phone',
+								'fmt': 'phone'
 							},
 							{
 								'name': 'Fax',
-								'label': 'Fax'
+								'label': 'Fax',
+								'fmt': 'phone'
 							},
 							{
 								'name': 'Website',
-								'label': 'Website'
+								'label': 'Website',
+								'fmt': 'url'
 							}
 						],						
 						'pageTitle': 'Accounts',
@@ -256,6 +265,19 @@
 			},
 			
 			ui: {
+			    
+			    formatters: {
+			        'phone': function(val) {
+					    return val ? "<a href='tel:" + val + "'>" + val + "</a>" : '';
+					},
+			        'url': function(val) {
+					    return val ? "<a href='http://" + val + "' rel='external' target='_blank'>" + val + "</a>" : '';
+					},
+			        'email': function(val) {
+					    return val ? "<a href='mailto:" + val + "'>" + val + "</a>" : '';
+					}
+
+			    },
 				
 				$container: function() {
 					return $('#container');
@@ -297,7 +319,13 @@
 				},
 				
 				createDetailPage: function(o) {
-					return $('#' + o.def.type + '-detail-page-template').tmpl(o);
+				    var $p = $('#object-detail-page-template').tmpl(o);
+				    var fields = [];
+				    $.each(app.data.meta[o.def.type]['fields'], function(idx, obj) {
+				        fields.push({'field': obj, 'o': o, 'fmt':(obj.fmt ? app.ui.formatters[obj.fmt] : null) });
+				    });
+				    $('#object-detail-field-template').tmpl(fields).appendTo($p.find('#' + o.def.type + '-' + o.obj.Id + '-detail-fields'));
+					return $p;
 				},
 				
 				renderDetailPage: function(o) {
@@ -312,6 +340,30 @@
 					app.ui.$container().append( $p );
 					return $p;				
 				},
+				
+				createEditPage: function(o) {
+				    var $p = $('#object-edit-page-template').tmpl(o);
+				    var fields = [];
+				    $.each(app.data.meta[o.def.type]['fields'], function(idx, obj) {
+				        fields.push({'field': obj, 'o': o, 'fmt':(obj.fmt ? app.ui.formatters[obj.fmt] : null) });
+				    });
+				    $('#object-edit-field-template').tmpl(fields).appendTo($p.find('#' + o.def.type + '-' + (o.obj.Id ? o.obj.Id : '') + '-edit-fields'));
+					return $p;
+				},
+				
+				renderEditPage: function(o) {
+					var pageId = '#' + o.def.type + '-' + (o.obj.Id ? o.obj.Id : '') +'-edit-page';
+					
+					// remove page if it exists
+					if ($(pageId).size() > 0) {
+						$(pageId).empty().remove();
+					}
+					
+					var $p = app.ui.createEditPage(o);
+					app.ui.$container().append( $p );
+					return $p;				
+				},
+
 				
 				$listPage: function(type) {
 					return $('#' + type + '-list-page');
@@ -361,24 +413,17 @@
 							$('.object-add-link').live('click', function(e, info) {
 								var $e = $(this),
 									objType = $e.jqmData('obj-type'),
-									objId = $e.jqmData('obj-id'),
-									pageId = '#' + objType + '-edit-page';
+									objId = $e.jqmData('obj-id');
 
-								$(pageId).remove();
-
-								console.log(pageId);
-								
 								var o = app.data.getObjByTypeAndId(objType, objId);
-								
+
 								// adding new object
 								if (!o) {
 									o = {'def': app.data.meta[objType], 'obj': {}};
 								}
 
-								$('#container').append( $('#' + objType + '-edit-page-template').tmpl(o) );
-								$.mobile.changePage( $(pageId) );
-								//e.stopPropagation();
-								//return false;			
+								var $p = app.ui.renderEditPage(o);
+								$.mobile.changePage($p);
 								e.preventDefault();
 							});
 						}
@@ -391,7 +436,7 @@
 								var $e = $(this),
 									objType = $e.jqmData('obj-type'),
 									objId = $e.jqmData('obj-id'),
-									pageId = '#' + objType + '-edit-page';
+									pageId = '#' + objType + '-' + (objId ? objId : '') + '-edit-page';
 
 								$.mobile.loadingMessage = "Saving ...";
 								$.mobile.showPageLoadingMsg();
@@ -414,8 +459,6 @@
 									$.mobile.changePage('#' + objType + '-list-page', {'reverse': true});
 								}, 250);
 
-								//e.stopPropagation();
-								//return false;
 								e.preventDefault();
 							});
 						}
@@ -490,14 +533,6 @@
 			}
 		};
 		
-		
-		// load jqm dynamically so it renders the dynamically added DOM content / pages
-		// $.getScript('http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.js', function() {
-		// 	$("#container").show();
-		// 	$('#loading').hide();
-		// 	//$.mobile.changePage( $('#contact-list-page'), {changeHash: true});
-		// 	
-		// });
 		app.run();
 		
 		window.app = app;

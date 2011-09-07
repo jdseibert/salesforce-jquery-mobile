@@ -57,69 +57,16 @@
 	</li>	
 	</script>
 
-	<script id="account-detail-page-template" type="text/x-jquery-tmpl">
+	<script id="object-detail-page-template" type="text/x-jquery-tmpl">
 	<div data-role="page" id="${def.type}-${obj.Id}" data-url="${def.type}-${obj.Id}" data-dom-cache='false' data-add-back-btn="true"> 
 		<div data-role="header" data-position="fixed">
 			<h1>${obj.Name}</h1>
-			<a id='${def.type}-add-link' rel='external' data-obj-type='${def.type}' class='ui-btn-right object-add-link'>Edit</a>
+			<a id='${def.type}-add-link' rel='external' data-obj-type='${def.type}' data-obj-id='${obj.Id}' class='ui-btn-right object-add-link'>Edit</a>
 		</div> 
 	
 		<div data-role="content">
-
-		<table border="0" cellspacing="5" cellpadding="5">
-			<tr>
-				<th>Type</th>
-				<td>${obj.Type}</td>
-			</tr>
-			<tr>
-				<th>Industry</th>
-				<td>${obj.Industry}</td>
-			</tr>
-			<tr>
-				<th>Phone</th>
-				<td><a href='tel:${obj.Phone}'>${obj.Phone}</a></td>
-			</tr>
-			<tr>
-				<th>Fax</th>
-				<td><a href='tel:${obj.Fax}'>${obj.Fax}</a></td>
-			</tr>
-			<tr>
-				<th>Website</th>
-				<td><a href='http://${obj.Website}' rel='external' target='_blank'>${obj.Website}</a></td>
-			</tr>
-		</table>
-		</div> 
-	
-		<div data-role="footer">
-		</div> 
-	</div>	
-	</script>
-	
-	<script id="contact-detail-page-template" type="text/x-jquery-tmpl">
-	<div data-role="page" id="${def.type}-${obj.Id}" data-url="${def.type}-${obj.Id}" data-dom-cache='false' data-add-back-btn="true"> 
-		<div data-role="header" data-position="fixed">
-			<h1>${def.rowTitleFn(obj)}</h1>
-			<a id='${def.type}-add-link' rel='external' data-obj-id='${obj.Id}' data-obj-type='${def.type}' class='ui-btn-right object-add-link'>Edit</a>
-		</div> 
-	
-		<div data-role="content">
-			<table border="0" cellspacing="5" cellpadding="5">
-				<tr>
-					<th>Title</th>
-					<td>${obj.Title}</td>
-				</tr>
-				<tr>
-					<th>Dept</th>
-					<td>${obj.Department}</td>
-				</tr>
-				<tr>
-					<th>Phone</th>
-					<td><a href='tel:${obj.Phone}'>${obj.Phone}</a></td>
-				</tr>
-				<tr>
-					<th>Email</th>
-					<td><a href='mailto:${obj.Email}'>${obj.Email}</a></td>
-				</tr>
+			<table id="${def.type}-${obj.Id}-detail-fields" border="0" cellspacing="5" cellpadding="5">
+				<!-- object-detail-field-template -->
 			</table>
 		</div> 
 	
@@ -128,42 +75,27 @@
 	</div>	
 	</script>
 
-	<script id="contact-edit-page-template" type="text/x-jquery-tmpl">
-	<div data-role="page" id="${def.type}-edit-page" data-url="${def.type}-edit-page"> 
+	<script id="object-detail-field-template" type="text/x-jquery-tmpl">
+	<tr>
+		<th>${field.label}</th>
+		<td>{{html fmt ? fmt(o.obj[field.name]) : o.obj[field.name] }}</td>
+	</tr>
+	</script>
+
+	
+	<script id="object-edit-page-template" type="text/x-jquery-tmpl">
+	<div data-role="page" id="${def.type}-${obj.Id}-edit-page" data-url="${def.type}-edit-page"> 
 		<div data-role="header" data-position="fixed">
 			<a href="#" data-rel="back" data-icon="delete">Cancel</a>
-			<h1>Edit Contact</h1>
+			<h1>Edit ${def.type}</h1>
 			<a id='${def.type}-save-link' data-obj-id='${obj.Id}' data-obj-type='${def.type}' class='object-save-link' data-icon="check">Save</a>
 		</div> 
 	
 		<div data-role="content">
-			<form>
+			<form id="${def.type}-${obj.Id}-edit-fields">
 				<input type="hidden" name="Id" id="Id" value="${obj.Id}"  />
 				<input type="hidden" name="obj-type" id="obj-type" value="${def.type}"  />
-				<div data-role="fieldcontain">
-				    <label for="LastName">Last Name:</label>
-				    <input type="text" name="LastName" id="LastName" value="${obj.LastName}"  />
-				</div>
-				<div data-role="fieldcontain">
-				    <label for="FirstName">First Name:</label>
-				    <input type="text" name="FirstName" id="FirstName" value="${obj.FirstName}"  />
-				</div>
-				<div data-role="fieldcontain">
-				    <label for="Title">Title:</label>
-				    <input type="text" name="Title" id="Title" value="${obj.Title}"  />
-				</div>
-				<div data-role="fieldcontain">
-				    <label for="Department">Department:</label>
-				    <input type="text" name="Department" id="Department" value="${obj.Department}"  />
-				</div>
-				<div data-role="fieldcontain">
-				    <label for="Phone">Phone:</label>
-				    <input type="text" name="Phone" id="Phone" value="${obj.Phone}"  />
-				</div>
-				<div data-role="fieldcontain">
-				    <label for="Email">Email:</label>
-				    <input type="text" name="Email" id="Email" value="${obj.Email}"  />
-				</div>
+				<!-- object-edit-field-template -->
 			</form>			
 		</div> 
 	
@@ -172,13 +104,13 @@
 	</div>	
 	</script>
 	
-	<script id="form-text-field-template" type="text/x-jquery-tmpl">
+	<script id="object-edit-field-template" type="text/x-jquery-tmpl">
 	<div data-role="fieldcontain">
-	    <label for="${def.name}">${def.label}:</label>
-	    <input type="text" name="${def.name}" id="${def.name}" value="${obj[def.name]}"  />
+	    <label for="${field.name}">${field.label}:</label>
+	    <input type="text" name="${field.name}" id="${field.name}" value="${o.obj[field.name]}"  />
 	</div>
 	</script>
-
+	
 	<style type="text/css" media="screen">
 		th {
 			text-align: right;
